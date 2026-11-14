@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SafeDose AI — Intelligent Medication & Injection Safety</title>
+<style>
+:root{--bg:#f4f7f9;--surface:#fff;--surface2:#eef3f6;--border:#d8e2e9;--text:#1a2b36;--muted:#5f7484;--teal:#0e7c7b;--teal-light:#e0f2f1;--blue:#1d5c8f;--amber:#b86e00;--amber-light:#fff3e0;--red:#b3261e;--red-light:#fce8e6;--green:#2e7d32;--green-light:#e8f5e9;--radius:14px;--shadow:0 2px 12px rgba(0,0,0,.06)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.5;min-height:100vh;padding-bottom:76px}
+button,input,select,textarea{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+.hidden{display:none!important}
+#disclaimer{background:var(--amber-light);color:#6b4400;font-size:.72rem;padding:.55rem .9rem;text-align:center;border-bottom:1px solid #f0d9b5;position:sticky;top:0;z-index:100;font-weight:600}
+header{background:linear-gradient(135deg,#0e7c7b,#1d5c8f);color:#fff;padding:1rem;display:flex;align-items:center;gap:.8rem;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+header .logo{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+header h1{font-size:1.15rem;font-weight:700}
+header p{font-size:.7rem;opacity:.9}
+main{padding:1rem;max-width:800px;margin:0 auto}
+.view{display:none}.view.active{display:block;animation:fade .2s}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+h2{font-size:1.3rem;font-weight:800;margin-bottom:.3rem;color:var(--blue)}
+p.sub{font-size:.85rem;color:var(--muted);margin-bottom:1rem}
+.card{background:var(--surface);border-radius:var(--radius);padding:1rem;margin-bottom:.85rem;box-shadow:var(--shadow);border:1px solid var(--border)}
+.card h3{font-size:1rem;font-weight:700;margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;color:var(--text)}
+.badge{font-size:.65rem;font-weight:700;padding:.2rem .5rem;border-radius:20px;background:var(--teal-light);color:var(--teal);margin-left:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;padding:.75rem 1.1rem;border-radius:12px;font-size:.9rem;font-weight:600;width:100%;transition:transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--teal);color:#fff}.btn-blue{background:var(--blue);color:#fff}
+.btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.btn-amber{background:var(--amber);color:#fff}
+.btn-sm{padding:.5rem .8rem;font-size:.8rem;width:auto}
+.status{padding:.75rem .9rem;border-radius:10px;font-size:.82rem;margin-top:.8rem;line-height:1.4;border-left:4px solid transparent}
+.status.info{background:var(--teal-light);color:#004d40;border-left-color:var(--teal)}
+.status.warn{background:var(--amber-light);color:#6b4400;border-left-color:var(--amber)}
+.status.error{background:var(--red-light);color:var(--red);border-left-color:var(--red)}
+.status.ok{background:var(--green-light);color:var(--green);border-left-color:var(--green)}
+label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.3rem}
+input,select{width:100%;padding:.75rem;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;background:var(--surface);margin-bottom:.7rem}
+input:focus,select:focus{border-color:var(--teal);outline:none}
+.row{display:flex;gap:.6rem}.row>*{flex:1}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
+.stat-box{background:var(--surface);border-radius:var(--radius);padding:.8rem;border:1px solid var(--border);box-shadow:var(--shadow);text-align:center}
+.stat-box .num{font-size:1.6rem;font-weight:800;color:var(--teal);line-height:1.1}
+.stat-box .num.red{color:var(--red)}.stat-box .num.amber{color:var(--amber)}
+.stat-box .lbl{font-size:.65rem;color:var(--muted);margin-top:.3rem;text-transform:uppercase;font-weight:700}
+.check-item{display:flex;align-items:flex-start;gap:.7rem;padding:.8rem 0;border-bottom:1px solid var(--border)}
+.check-item:last-child{border-bottom:none}
+.check-item input{width:24px;height:24px;flex-shrink:0;accent-color:var(--teal);margin-top:-2px}
+.check-item .lt{font-size:.88rem;font-weight:600}.check-item .lt small{display:block;font-weight:400;color:var(--muted);font-size:.75rem;margin-top:2px}
+.chart{display:flex;align-items:flex-end;gap:.5rem;height:120px;padding:.5rem 0}
+.chart .bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;height:100%}
+.chart .bar{width:100%;background:var(--teal);border-radius:6px 6px 0 0;min-height:4px;transition:height .4s}
+.chart .bar.warn{background:var(--amber)}.chart .bar.danger{background:var(--red)}
+.chart .bl{font-size:.65rem;color:var(--muted);font-weight:600}.chart .bv{font-size:.7rem;font-weight:700}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:90;padding:.4rem 0 calc(.4rem + env(safe-area-inset-bottom,0px));box-shadow:0 -2px 10px rgba(0,0,0,.05)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:.15rem;padding:.3rem .1rem;font-size:.6rem;color:var(--muted);font-weight:700}
+nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
+.hero{background:var(--surface);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:1rem}
+.hero h2{font-size:1.5rem;margin-bottom:.5rem}.hero p{font-size:.9rem;color:var(--muted);margin-bottom:1.2rem}
+.log-item{font-size:.8rem;padding:.6rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.log-item:last-child{border-bottom:none}
+.log-tag{font-size:.65rem;padding:.15rem .4rem;border-radius:6px;font-weight:700}
+.log-tag.ok{background:var(--green-light);color:var(--green)}.log-tag.warn{background:var(--red-light);color:var(--red)}
+@media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+</style>
+</head>
+<body>
+
+<div id="disclaimer">
+  PROTOTYPE — NOT A MEDICAL DEVICE. Simulated data only. Never use for real clinical decisions.
+</div>
+
+<header>
+  <div class="logo">💊</div>
+  <div><h1>SafeDose AI</h1><p>Intelligent Medication & Injection Safety</p></div>
+</header>
+
+<main>
+  <section id="view-home" class="view active">
+    <div class="hero">
+      <h2>Safer Care, Powered by AI</h2>
+      <p>Demonstrating how smart verification, digital checklists, and early-warning monitoring can reduce preventable medication errors in Nigerian healthcare.</p>
+      <button class="btn btn-primary" onclick="go('verify')">Start Verification</button>
+    </div>
+    
+    <div class="stats-grid">
+      <div class="stat-box"><div class="num" id="dash-verify">0</div><div class="lbl">Verifications</div></div>
+      <div class="stat-box"><div class="num red" id="dash-incidents">0</div><div class="lbl">Warnings</div></div>
+      <div class="stat-box"><div class="num" id="dash-check">0</div><div class="lbl">Checks Done</div></div>
+      <div class="stat-box"><div class="num amber">93%</div><div class="lbl">Compliance</div></div>
+    </div>
+
+    <div class="card">
+      <h3>🎯 Core Features</h3>
+      <ul style="list-style:none;padding:0;font-size:.85rem">
+        <li style="padding:.5rem 0;border-bottom:1px solid var(--border)"><strong>A. Smart Medication Verification:</strong> QR simulation, identity matching, and expiry alerts.</li>
+        <li style="padding:.5rem 0;border-bottom:1px solid var(--border)"><strong>B. Injection Safety Intelligence:</strong> Digital preparation checklist with strict warnings.</li>
+        <li style="padding:.5rem 0"><strong>C. Early-Warning Monitoring:</strong> Simulated observations, adverse reaction logging, and escalation.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="view-verify" class="view">
+    <h2>Smart Medication Verification</h2>
+    <p class="sub">Verify patient identity and medication details. Demonstrates error prevention.</p>
+
+    <div class="card">
+      <h3>Step 1: Patient Identity</h3>
+      <label>Select Patient</label>
+      <select id="p-id">
+        <option value="">— Choose Patient —</option>
+        <option value="P-1042">Amina O. (F, 34) — P-1042</option>
+        <option value="P-2087">Chinedu E. (M, 58) — P-2087</option>
+      </select>
+      <label>Confirm Patient ID</label>
+      <input type="text" id="p-confirm" placeholder="Type ID exactly (e.g. P-1042)">
+    </div>
+
+    <div class="card">
+      <h3>Step 2: Medication Identity</h3>
+      <div class="row">
+        <div style="flex:2">
+          <label>Select Medication</label>
+          <select id="m-id">
+            <option value="">— Choose Medication —</option>
+            <option value="MED-ART-01">Artemether/Lumefantrine</option>
+            <option value="MED-AMX-05">Amoxicillin 500mg</option>
+            <option value="MED-INS-03">Insulin 100 IU/mL</option>
+          </select>
+        </div>
+        <div style="flex:1;display:flex;align-items:flex-end">
+          <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.7rem" onclick="simulateScan()">📷 Scan QR</button>
+        </div>
+      </div>
+      <p style="font-size:.7rem;color:var(--muted);margin-top:-.4rem">Camera is simulated. Manual selection is available above.</p>
+      
+      <div id="med-details" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border)">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>Batch:</span><strong id="md-batch">-</strong></div>
+        <div style="display:flex;justify-content:space-between;font-size:.8rem"><span>Expiry:</span><strong id="md-expiry">-</strong></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="runVerification()">🔍 Verify & Check Safety</button>
+    <div id="verify-result"></div>
+  </section>
+
+  <section id="view-injection" class="view">
+    <h2>Injection Safety Intelligence</h2>
+    <p class="sub">A strict preparation checklist to prevent infection and errors.</p>
+
+    <div class="card">
+      <h3>Preparation Checklist <span class="badge" id="chk-progress">0 / 5</span></h3>
+      <div class="check-item"><input type="checkbox" id="c1" onchange="updateChecklist()"><div class="lt">Hand Hygiene Performed<small>Wash hands or use alcohol rub.</small></div></div>
+      <div class="check-item"><input type="checkbox" id="c2" onchange="updateChecklist()"><div class="lt">Sterile Equipment Confirmed<small>Check needle and syringe packaging.</small></div></div>
+      <div class="check-item"><input type="checkbox" id="c3" onchange="updateChecklist()"><div class="lt">Medication Expiry Checked<small>Verify date on vial/ampoule.</small></div></div>
+      <div class="check-item"><input type="checkbox" id="c4" onchange="updateChecklist()"><div class="lt">Patient Identity Re-confirmed<small>Two identifiers verified.</small></div></div>
+      <div class="check-item"><input type="checkbox" id="c5" onchange="updateChecklist()"><div class="lt">Sharps Disposal Ready<small>Container within reach.</small></div></div>
+      
+      <div id="chk-status"></div>
+    </div>
+  </section>
+
+  <section id="view-monitor" class="view">
+    <h2>Early-Warning Monitoring</h2>
+    <p class="sub">Simulate post-medication observations and detect warning signs.</p>
+
+    <div class="card">
+      <h3>Record Observation</h3>
+      <div class="row">
+        <div><label>Temp (°C)</label><input type="number" id="o-temp" value="37.0" step="0.1"></div>
+        <div><label>Heart Rate (bpm)</label><input type="number" id="o-hr" value="76"></div>
+      </div>
+      <div class="row">
+        <div><label>Systolic BP</label><input type="number" id="o-bp" value="120"></div>
+        <div><label>SpO₂ (%)</label><input type="number" id="o-spo2" value="98"></div>
+      </div>
+      <label>Suspected Reaction</label>
+      <select id="o-rx">
+        <option value="none">None reported</option>
+        <option value="rash">Rash / Itching</option>
+        <option value="breath">Breathing Difficulty</option>
+        <option value="dizzy">Dizziness</option>
+      </select>
+      <button class="btn btn-primary" onclick="recordObs()">📝 Record & Analyze</button>
+      <div id="obs-result"></div>
+    </div>
+
+    <div class="card">
+      <h3>Monitoring History</h3>
+      <div id="obs-history"><p style="font-size:.8rem;color:var(--muted)">No records yet.</p></div>
+    </div>
+  </section>
+
+  <section id="view-analytics" class="view">
+    <h2>Hospital Safety Analytics</h2>
+    <p class="sub">Simulated dashboard showing safety trends.</p>
+
+    <div class="card">
+      <h3>📈 Verification Trend (Simulated)</h3>
+      <div class="chart">
+        <div class="bw"><div class="bv">32</div><div class="bar" style="height:60%"></div><div class="bl">Mon</div></div>
+        <div class="bw"><div class="bv">41</div><div class="bar" style="height:80%"></div><div class="bl">Tue</div></div>
+        <div class="bw"><div class="bv">38</div><div class="bar" style="height:75%"></div><div class="bl">Wed</div></div>
+        <div class="bw"><div class="bv">52</div><div class="bar warn" style="height:100%"></div><div class="bl">Thu</div></div>
+        <div class="bw"><div class="bv">47</div><div class="bar" style="height:90%"></div><div class="bl">Fri</div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>⚠️ Incident Categories</h3>
+      <div class="chart">
+        <div class="bw"><div class="bv">2</div><div class="bar warn" style="height:40%"></div><div class="bl">Identity</div></div>
+        <div class="bw"><div class="bv">1</div><div class="bar danger" style="height:20%"></div><div class="bl">Expiry</div></div>
+        <div class="bw"><div class="bv">0</div><div class="bar" style="height:5%"></div><div class="bl">Hygiene</div></div>
+        <div class="bw"><div class="bv">1</div><div class="bar danger" style="height:20%"></div><div class="bl">Sharps</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-about" class="view">
+    <h2>About SafeDose AI</h2>
+    <div class="card">
+      <h3>Project Purpose</h3>
+      <p style="font-size:.85rem;line-height:1.6">SafeDose AI is a demonstration prototype created for the USPF Changemaker Challenge. It explores how AI-assisted workflows could support medication verification, injection safety, and monitoring in resource-constrained Nigerian healthcare settings.</p>
+    </div>
+    <div class="card">
+      <h3>Limitations</h3>
+      <ul style="list-style:none;padding:0;font-size:.85rem;line-height:1.6">
+        <li>• Not a clinically validated medical device.</li>
+        <li>• Not deployed in any real hospital.</li>
+        <li>• No real patient data is stored or processed.</li>
+        <li>• Does not prescribe, diagnose, or calculate doses.</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-v="home" class="active" onclick="go('home')"><span class="ni">🏠</span>Home</button>
+  <button data-v="verify" onclick="go('verify')"><span class="ni">💊</span>Verify</button>
+  <button data-v="injection" onclick="go('injection')"><span class="ni">💉</span>Inject</button>
+  <button data-v="monitor" onclick="go('monitor')"><span class="ni">📝</span>Monitor</button>
+  <button data-v="analytics" onclick="go('analytics')"><span class="ni">📊</span>Charts</button>
+</nav>
+
+<script>
+const CONFIG = {
+  GROQ_API_KEY: 'PASTE_YOUR_GROQ_KEY_HERE',
+  MODEL: 'llama-3.3-70b-versatile'
+};
+
+let stats = { verifications: 0, warnings: 0, checks: 0, observations: 0 };
+const MEDS = {
+  'MED-ART-01': { batch: 'SIM-ART-041', expiry: '2027-08' },
+  'MED-AMX-05': { batch: 'SIM-AMX-118', expiry: '2027-02' },
+  'MED-INS-03': { batch: 'SIM-INS-009', expiry: '2026-12' }
+};
+
+function go(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+document.getElementById('m-id').addEventListener('change', function(){
+  const m = MEDS[this.value];
+  const box = document.getElementById('med-details');
+  if(!m){ box.classList.add('hidden'); return; }
+  document.getElementById('md-batch').textContent = m.batch;
+  document.getElementById('md-expiry').textContent = m.expiry;
+  box.classList.remove('hidden');
+});
+
+function simulateScan(){
+  const mId = document.getElementById('m-id');
+  if(!mId.value){
+    mId.value = 'MED-AMX-05';
+    mId.dispatchEvent(new Event('change'));
+    alert("📷 Simulated Scan Complete: Medication 'Amoxicillin 500mg' identified.");
+  } else {
+    alert("📷 Simulated Scan Complete: Verified " + mId.value);
+  }
+}
+
+function runVerification(){
+  const pId = document.getElementById('p-id').value;
+  const pConf = document.getElementById('p-confirm').value.trim().toUpperCase();
+  const mId = document.getElementById('m-id').value;
+  const box = document.getElementById('verify-result');
+  
+  if(!pId || !mId || !pConf){
+    box.innerHTML = '<div class="status warn">⚠️ Please complete all fields.</div>'; return;
+  }
+  
+  stats.verifications++;
+  
+  if(pConf !== pId){
+    stats.warnings++;
+    box.innerHTML = '<div class="status error"><strong>❌ Identity Mismatch!</strong> Patient ID typed does not match selected patient. In a real system, this would halt the procedure.</div>';
+  } else {
+    box.innerHTML = '<div class="status ok"><strong>✅ Verification Successful.</strong> Patient and medication match. Safety check complete. This does not authorise administration.</div>';
+  }
+  updateDashboard();
+}
+
+function updateChecklist(){
+  const boxes = document.querySelectorAll('#view-injection input[type="checkbox"]');
+  let checked = 0;
+  boxes.forEach(b => { if(b.checked) checked++; });
+  
+  document.getElementById('chk-progress').textContent = checked + ' / 5';
+  const status = document.getElementById('chk-status');
+  
+  if(checked === 5){
+    stats.checks++;
+    updateDashboard();
+    status.innerHTML = '<div class="status ok"><strong>✅ Checklist Complete.</strong> All safety steps marked. This does NOT authorise injection. Final clinical judgement remains with the professional.</div>';
+  } else if(checked > 0){
+    status.innerHTML = '<div class="status warn">⚠️ Incomplete: ' + (5-checked) + ' steps remaining. Do not proceed until all checks are complete.</div>';
+  } else {
+    status.innerHTML = '';
+  }
+}
+
+let history = [];
+function recordObs(){
+  const t = parseFloat(document.getElementById('o-temp').value);
+  const hr = parseInt(document.getElementById('o-hr').value);
+  const bp = parseInt(document.getElementById('o-bp').value);
+  const spo2 = parseInt(document.getElementById('o-spo2').value);
+  const rx = document.getElementById('o-rx').value;
+  const box = document.getElementById('obs-result');
+  
+  if(isNaN(t) || isNaN(hr)){
+    box.innerHTML = '<div class="status error">❌ Please enter valid numbers for vitals.</div>'; return;
+  }
+  
+  let flags = [];
+  if(t >= 38.0) flags.push("High Temp");
+  if(hr > 100 || hr < 50) flags.push("Abnormal HR");
+  if(spo2 < 94) flags.push("Low SpO₂");
+  if(rx !== 'none') flags.push("Reaction");
+  
+  stats.observations++;
+  
+  if(flags.length > 0){
+    stats.warnings++;
+    box.innerHTML = '<div class="status error"><strong>🚨 WARNING FLAGS DETECTED:</strong> ' + flags.join(', ') + '. Escalate to a qualified professional immediately (Simulation).</div>';
+  } else {
+    box.innerHTML = '<div class="status ok"><strong>✅ Recorded.</strong> No warning thresholds triggered in this simulation.</div>';
+  }
+  
+  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  history.unshift({ time, t, hr, flags });
+  renderHistory();
+  updateDashboard();
+}
+
+function renderHistory(){
+  const list = document.getElem
