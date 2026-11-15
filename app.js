@@ -1,6 +1,6 @@
 const CONFIG = {
   GROQ_API_KEY: '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',
-  MODEL: 'llama-3.1-8b-instant'
+  MODEL: 'gemma2-9b-it'
 };
 
 let stats = { verifications: 0, warnings: 0, checks: 0, observations: 0 };
@@ -131,4 +131,4 @@ function resetSession(){
   document.getElementById('chk-progress').textContent = '0 / 5';
   updateDashboard();
   alert("Session data reset to 0.");
-    }
+}
