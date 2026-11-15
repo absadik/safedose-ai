@@ -36,7 +36,7 @@ p.sub{font-size:.85rem;color:var(--muted);margin-bottom:1rem}
 .status.ok{background:var(--green-light);color:var(--green);border-left-color:var(--green)}
 label{display:block;font-size:.8rem;font-weight:600;margin-bottom:.3rem}
 input,select{width:100%;padding:.75rem;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;background:var(--surface);margin-bottom:.7rem}
-input,select{width:100%;padding:.75rem;border:1.5px solid var(--border);border-radius:10px;font-size:.9rem;background:var(--surface);margin-bottom:.7rem; -webkit-appearance: menulist-button; appearance: menulist-button;}
+input:focus,select:focus{border-color:var(--teal);outline:none}
 .row{display:flex;gap:.6rem}.row>*{flex:1}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1rem}
 .stat-box{background:var(--surface);border-radius:var(--radius);padding:.8rem;border:1px solid var(--border);box-shadow:var(--shadow);text-align:center}
@@ -102,37 +102,21 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
 
   <section id="view-verify" class="view">
     <h2>Smart Medication Verification</h2>
-    <p class="sub">Verify patient identity and medication details. Demonstrates error prevention.</p>
+    <p class="sub">Type the IDs below to simulate verification.</p>
 
     <div class="card">
       <h3>Step 1: Patient Identity</h3>
-      <label>Select Patient</label>
-      <select id="p-id">
-        <option value="">— Choose Patient —</option>
-        <option value="P-1042">Amina O. (F, 34) — P-1042</option>
-        <option value="P-2087">Chinedu E. (M, 58) — P-2087</option>
-      </select>
+      <label>Type Patient ID (e.g., P-1042)</label>
+      <input type="text" id="p-id" placeholder="Enter Patient ID">
       <label>Confirm Patient ID</label>
-      <input type="text" id="p-confirm" placeholder="Type ID exactly (e.g. P-1042)">
+      <input type="text" id="p-confirm" placeholder="Confirm Patient ID">
     </div>
 
     <div class="card">
-      <h3>Step 2: Medication Identity</h3>
-      <div class="row">
-        <div style="flex:2">
-          <label>Select Medication</label>
-          <select id="m-id">
-            <option value="">— Choose Medication —</option>
-            <option value="MED-ART-01">Artemether/Lumefantrine</option>
-            <option value="MED-AMX-05">Amoxicillin 500mg</option>
-            <option value="MED-INS-03">Insulin 100 IU/mL</option>
-          </select>
-        </div>
-        <div style="flex:1;display:flex;align-items:flex-end">
-          <button class="btn btn-secondary btn-sm" style="width:100%;margin-bottom:.7rem" onclick="simulateScan()">📷 Scan QR</button>
-        </div>
-      </div>
-      <p style="font-size:.7rem;color:var(--muted);margin-top:-.4rem">Camera is simulated. Manual selection is available above.</p>
+      <h3>Step 2: Medication Code</h3>
+      <label>Type Medication Code (e.g., MED-AMX-05)</label>
+      <input type="text" id="m-id" placeholder="Enter Medication Code">
+      <p style="font-size:.7rem;color:var(--muted);margin-top:-.4rem">Valid codes: MED-ART-01, MED-AMX-05, MED-INS-03</p>
       
       <div id="med-details" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border)">
         <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>Batch:</span><strong id="md-batch">-</strong></div>
@@ -245,7 +229,7 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
 
 <script>
 const CONFIG = {
-  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',
+  GROQ_API_KEY: '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',
   MODEL: 'llama-3.3-70b-versatile'
 };
 
@@ -263,44 +247,35 @@ function go(id){
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
-document.getElementById('m-id').addEventListener('change', function(){
-  const m = MEDS[this.value];
-  const box = document.getElementById('med-details');
-  if(!m){ box.classList.add('hidden'); return; }
-  document.getElementById('md-batch').textContent = m.batch;
-  document.getElementById('md-expiry').textContent = m.expiry;
-  box.classList.remove('hidden');
-});
-
-function simulateScan(){
-  const mId = document.getElementById('m-id');
-  if(!mId.value){
-    mId.value = 'MED-AMX-05';
-    mId.dispatchEvent(new Event('change'));
-    alert("📷 Simulated Scan Complete: Medication 'Amoxicillin 500mg' identified.");
-  } else {
-    alert("📷 Simulated Scan Complete: Verified " + mId.value);
-  }
-}
-
 function runVerification(){
-  const pId = document.getElementById('p-id').value;
+  const pId = document.getElementById('p-id').value.trim().toUpperCase();
   const pConf = document.getElementById('p-confirm').value.trim().toUpperCase();
-  const mId = document.getElementById('m-id').value;
+  const mId = document.getElementById('m-id').value.trim().toUpperCase();
   const box = document.getElementById('verify-result');
   
   if(!pId || !mId || !pConf){
-    box.innerHTML = '<div class="status warn">⚠️ Please complete all fields.</div>'; return;
+    box.innerHTML = '<div class="status warn">⚠️ Please fill in all boxes.</div>'; return;
   }
-  
-  stats.verifications++;
   
   if(pConf !== pId){
     stats.warnings++;
-    box.innerHTML = '<div class="status error"><strong>❌ Identity Mismatch!</strong> Patient ID typed does not match selected patient. In a real system, this would halt the procedure.</div>';
-  } else {
-    box.innerHTML = '<div class="status ok"><strong>✅ Verification Successful.</strong> Patient and medication match. Safety check complete. This does not authorise administration.</div>';
+    updateDashboard();
+    box.innerHTML = '<div class="status error"><strong>❌ Identity Mismatch!</strong> The typed IDs do not match. In a real system, this would halt the procedure.</div>';
+    return;
   }
+
+  if(!MEDS[mId]){
+    box.innerHTML = '<div class="status error"><strong>❌ Unknown Medication!</strong> Try typing MED-ART-01, MED-AMX-05, or MED-INS-03.</div>';
+    return;
+  }
+
+  const m = MEDS[mId];
+  document.getElementById('md-batch').textContent = m.batch;
+  document.getElementById('md-expiry').textContent = m.expiry;
+  document.getElementById('med-details').classList.remove('hidden');
+
+  stats.verifications++;
+  box.innerHTML = '<div class="status ok"><strong>✅ Verification Successful.</strong> Patient and medication match. Safety check complete. This does not authorise administration.</div>';
   updateDashboard();
 }
 
@@ -358,4 +333,21 @@ function recordObs(){
 }
 
 function renderHistory(){
-  const list = document.getElem
+  const list = document.getElementById('obs-history');
+  if(history.length === 0) return;
+  list.innerHTML = history.map(h => `
+    <div class="log-item">
+      <span>${h.time} — ${h.t}°C, ${h.hr} bpm</span>
+      <span class="log-tag ${h.flags.length > 0 ? 'warn' : 'ok'}">${h.flags.length > 0 ? 'Warnings' : 'Normal'}</span>
+    </div>
+  `).join('');
+}
+
+function updateDashboard(){
+  document.getElementById('dash-verify').textContent = stats.verifications;
+  document.getElementById('dash-incidents').textContent = stats.warnings;
+  document.getElementById('dash-check').textContent = stats.checks;
+}
+</script>
+</body>
+          </html>
