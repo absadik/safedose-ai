@@ -1,3 +1,4 @@
+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
 let stats = { verifications: 0, warnings: 0, checks: 0, observations: 0 };
 const MEDS = {
   'MED-ART-01': { batch: 'SIM-ART-041', expiry: '2027-08' },
