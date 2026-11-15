@@ -82,12 +82,28 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
       <p>Demonstrating how smart verification, digital checklists, and early-warning monitoring can reduce preventable medication errors in Nigerian healthcare.</p>
       <button class="btn btn-primary" onclick="go('verify')">Start Verification</button>
     </div>
+
+    <div class="card" style="border: 2px solid var(--amber);">
+      <h3>🎬 Guided Demo Scenario</h3>
+      <p style="font-size:.85rem; margin-bottom:.5rem">Follow these steps for a complete safety workflow demonstration:</p>
+      <ol style="font-size:.85rem; padding-left:1.2rem; margin-bottom:.5rem; line-height:1.6;">
+        <li>Go to <strong>Verify</strong> and type <code style="background:var(--surface2);padding:2px 4px;border-radius:4px;">P-1042</code> in the first box, and <code style="background:var(--surface2);padding:2px 4px;border-radius:4px;">P-9999</code> in the second (simulate a mismatch).</li>
+        <li>Type <code style="background:var(--surface2);padding:2px 4px;border-radius:4px;">MED-AMX-05</code> for the drug and hit Verify to see the red warning.</li>
+        <li>Go to <strong>Inject</strong> and complete the checklist.</li>
+        <li>Go to <strong>Monitor</strong> and enter a Temp of <code style="background:var(--surface2);padding:2px 4px;border-radius:4px;">39.5</code> to trigger an alert.</li>
+      </ol>
+    </div>
     
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:.5rem; padding:0 .2rem;">
+      <h3 style="font-size:.9rem; color:var(--blue); margin:0;">📱 Your Session Data</h3>
+      <button class="btn btn-secondary btn-sm" onclick="resetSession()" style="font-size:.65rem; padding:.2rem .5rem;">Reset</button>
+    </div>
+
     <div class="stats-grid">
       <div class="stat-box"><div class="num" id="dash-verify">0</div><div class="lbl">Verifications</div></div>
       <div class="stat-box"><div class="num red" id="dash-incidents">0</div><div class="lbl">Warnings</div></div>
       <div class="stat-box"><div class="num" id="dash-check">0</div><div class="lbl">Checks Done</div></div>
-      <div class="stat-box"><div class="num amber">93%</div><div class="lbl">Compliance</div></div>
+      <div class="stat-box"><div class="num amber">93%</div><div class="lbl">Sim. Compliance</div></div>
     </div>
 
     <div class="card">
@@ -177,7 +193,10 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
 
   <section id="view-analytics" class="view">
     <h2>Hospital Safety Analytics</h2>
-    <p class="sub">Simulated dashboard showing safety trends.</p>
+    
+    <div class="status warn" style="margin-bottom:1rem; font-weight:600; border-left-width:6px;">
+      ⚠️ FICTIONAL HOSPITAL DATA. These charts represent simulated facility analytics and do NOT reflect real patient outcomes.
+    </div>
 
     <div class="card">
       <h3>📈 Verification Trend (Simulated)</h3>
@@ -191,7 +210,7 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
     </div>
 
     <div class="card">
-      <h3>⚠️ Incident Categories</h3>
+      <h3>⚠️ Incident Categories (Simulated)</h3>
       <div class="chart">
         <div class="bw"><div class="bv">2</div><div class="bar warn" style="height:40%"></div><div class="bl">Identity</div></div>
         <div class="bw"><div class="bv">1</div><div class="bar danger" style="height:20%"></div><div class="bl">Expiry</div></div>
@@ -207,6 +226,12 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
       <h3>Project Purpose</h3>
       <p style="font-size:.85rem;line-height:1.6">SafeDose AI is a demonstration prototype created for the USPF Changemaker Challenge. It explores how AI-assisted workflows could support medication verification, injection safety, and monitoring in resource-constrained Nigerian healthcare settings.</p>
     </div>
+    
+    <div class="card">
+      <h3>User Need & Validation</h3>
+      <p style="font-size:.85rem;line-height:1.6">The design of SafeDose AI was informed by informal feedback from frontline nurses and pharmacists in Nigeria. They highlighted that manual paper checklists are often skipped during high-pressure situations, and that identity mismatches are a real, persistent concern. No patient information was collected during this feedback process.</p>
+    </div>
+
     <div class="card">
       <h3>Limitations</h3>
       <ul style="list-style:none;padding:0;font-size:.85rem;line-height:1.6">
@@ -303,51 +328,4 @@ function recordObs(){
   const t = parseFloat(document.getElementById('o-temp').value);
   const hr = parseInt(document.getElementById('o-hr').value);
   const bp = parseInt(document.getElementById('o-bp').value);
-  const spo2 = parseInt(document.getElementById('o-spo2').value);
-  const rx = document.getElementById('o-rx').value;
-  const box = document.getElementById('obs-result');
-  
-  if(isNaN(t) || isNaN(hr)){
-    box.innerHTML = '<div class="status error">❌ Please enter valid numbers for vitals.</div>'; return;
-  }
-  
-  let flags = [];
-  if(t >= 38.0) flags.push("High Temp");
-  if(hr > 100 || hr < 50) flags.push("Abnormal HR");
-  if(spo2 < 94) flags.push("Low SpO₂");
-  if(rx !== 'none') flags.push("Reaction");
-  
-  stats.observations++;
-  
-  if(flags.length > 0){
-    stats.warnings++;
-    box.innerHTML = '<div class="status error"><strong>🚨 WARNING FLAGS DETECTED:</strong> ' + flags.join(', ') + '. Escalate to a qualified professional immediately (Simulation).</div>';
-  } else {
-    box.innerHTML = '<div class="status ok"><strong>✅ Recorded.</strong> No warning thresholds triggered in this simulation.</div>';
-  }
-  
-  const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-  history.unshift({ time, t, hr, flags });
-  renderHistory();
-  updateDashboard();
-}
-
-function renderHistory(){
-  const list = document.getElementById('obs-history');
-  if(history.length === 0) return;
-  list.innerHTML = history.map(h => `
-    <div class="log-item">
-      <span>${h.time} — ${h.t}°C, ${h.hr} bpm</span>
-      <span class="log-tag ${h.flags.length > 0 ? 'warn' : 'ok'}">${h.flags.length > 0 ? 'Warnings' : 'Normal'}</span>
-    </div>
-  `).join('');
-}
-
-function updateDashboard(){
-  document.getElementById('dash-verify').textContent = stats.verifications;
-  document.getElementById('dash-incidents').textContent = stats.warnings;
-  document.getElementById('dash-check').textContent = stats.checks;
-}
-</script>
-</body>
-          </html>
+  const spo2 = parseInt(document.getElementById('o-spo2').valu
