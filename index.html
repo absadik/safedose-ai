@@ -47,21 +47,31 @@
       <div class="stat-box"><div class="num" id="dash-check">0</div><div class="lbl">Checks Done</div></div>
       <div class="stat-box"><div class="num amber">93%</div><div class="lbl">Sim. Compliance</div></div>
     </div>
+  </section>
 
+  <section id="view-ai" class="view">
+    <h2>AI Safety Assistant</h2>
+    <p class="sub">Ask general questions. The AI will <strong>not</strong> prescribe, diagnose, or calculate doses.</p>
     <div class="card">
-      <h3>🎯 Core Features</h3>
-      <ul style="list-style:none;padding:0;font-size:.85rem">
-        <li style="padding:.5rem 0;border-bottom:1px solid var(--border)"><strong>A. Smart Medication Verification:</strong> QR simulation, identity matching, and expiry alerts.</li>
-        <li style="padding:.5rem 0;border-bottom:1px solid var(--border)"><strong>B. Injection Safety Intelligence:</strong> Digital preparation checklist with strict warnings.</li>
-        <li style="padding:.5rem 0"><strong>C. Early-Warning Monitoring:</strong> Simulated observations, adverse reaction logging, and escalation.</li>
-      </ul>
+      <h3>🤖 Powered by Groq (Llama 3.3) <span class="badge">LIVE</span></h3>
+      <div class="sug">
+        <button onclick="askSuggestion('What are the 5 rights of medication administration?')">5 rights</button>
+        <button onclick="askSuggestion('How should sharps be disposed of safely?')">Sharps</button>
+        <button onclick="askSuggestion('Why is hand hygiene important before injection?')">Hand hygiene</button>
+      </div>
+      <div class="chat-box" id="chat-box">
+        <div class="msg ai">Hello. I am the SafeDose AI assistant. I can explain general safety concepts but I will not prescribe or diagnose. What would you like to learn?</div>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chat-input" placeholder="Type your question..." onkeypress="if(event.key==='Enter')sendChat()">
+        <button class="btn btn-primary btn-sm" onclick="sendChat()">Send</button>
+      </div>
     </div>
   </section>
 
   <section id="view-verify" class="view">
     <h2>Smart Medication Verification</h2>
     <p class="sub">Type the IDs below to simulate verification.</p>
-
     <div class="card">
       <h3>Step 1: Patient Identity</h3>
       <label>Type Patient ID (e.g., P-1042)</label>
@@ -69,19 +79,16 @@
       <label>Confirm Patient ID</label>
       <input type="text" id="p-confirm" placeholder="Confirm Patient ID">
     </div>
-
     <div class="card">
       <h3>Step 2: Medication Code</h3>
       <label>Type Medication Code (e.g., MED-AMX-05)</label>
       <input type="text" id="m-id" placeholder="Enter Medication Code">
       <p style="font-size:.7rem;color:var(--muted);margin-top:-.4rem">Valid codes: MED-ART-01, MED-AMX-05, MED-INS-03</p>
-      
       <div id="med-details" class="hidden" style="margin-top:1rem;padding-top:1rem;border-top:1px dashed var(--border)">
         <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>Batch:</span><strong id="md-batch">-</strong></div>
         <div style="display:flex;justify-content:space-between;font-size:.8rem"><span>Expiry:</span><strong id="md-expiry">-</strong></div>
       </div>
     </div>
-
     <button class="btn btn-primary" onclick="runVerification()">🔍 Verify & Check Safety</button>
     <div id="verify-result"></div>
   </section>
@@ -89,7 +96,6 @@
   <section id="view-injection" class="view">
     <h2>Injection Safety Intelligence</h2>
     <p class="sub">A strict preparation checklist to prevent infection and errors.</p>
-
     <div class="card">
       <h3>Preparation Checklist <span class="badge" id="chk-progress">0 / 5</span></h3>
       <div class="check-item"><input type="checkbox" id="c1" onchange="updateChecklist()"><div class="lt">Hand Hygiene Performed<small>Wash hands or use alcohol rub.</small></div></div>
@@ -97,7 +103,6 @@
       <div class="check-item"><input type="checkbox" id="c3" onchange="updateChecklist()"><div class="lt">Medication Expiry Checked<small>Verify date on vial/ampoule.</small></div></div>
       <div class="check-item"><input type="checkbox" id="c4" onchange="updateChecklist()"><div class="lt">Patient Identity Re-confirmed<small>Two identifiers verified.</small></div></div>
       <div class="check-item"><input type="checkbox" id="c5" onchange="updateChecklist()"><div class="lt">Sharps Disposal Ready<small>Container within reach.</small></div></div>
-      
       <div id="chk-status"></div>
     </div>
   </section>
@@ -105,7 +110,6 @@
   <section id="view-monitor" class="view">
     <h2>Early-Warning Monitoring</h2>
     <p class="sub">Simulate post-medication observations and detect warning signs.</p>
-
     <div class="card">
       <h3>Record Observation</h3>
       <div class="row">
@@ -126,7 +130,6 @@
       <button class="btn btn-primary" onclick="recordObs()">📝 Record & Analyze</button>
       <div id="obs-result"></div>
     </div>
-
     <div class="card">
       <h3>Monitoring History</h3>
       <div id="obs-history"><p style="font-size:.8rem;color:var(--muted)">No records yet.</p></div>
@@ -135,11 +138,9 @@
 
   <section id="view-analytics" class="view">
     <h2>Hospital Safety Analytics</h2>
-    
     <div class="status warn" style="margin-bottom:1rem; font-weight:600; border-left-width:6px;">
       ⚠️ FICTIONAL HOSPITAL DATA. These charts represent simulated facility analytics and do NOT reflect real patient outcomes.
     </div>
-
     <div class="card">
       <h3>📈 Verification Trend (Simulated)</h3>
       <div class="chart">
@@ -150,7 +151,6 @@
         <div class="bw"><div class="bv">47</div><div class="bar" style="height:90%"></div><div class="bl">Fri</div></div>
       </div>
     </div>
-
     <div class="card">
       <h3>⚠️ Incident Categories (Simulated)</h3>
       <div class="chart">
@@ -168,12 +168,10 @@
       <h3>Project Purpose</h3>
       <p style="font-size:.85rem;line-height:1.6">SafeDose AI is a demonstration prototype created for the USPF Changemaker Challenge. It explores how AI-assisted workflows could support medication verification, injection safety, and monitoring in resource-constrained Nigerian healthcare settings.</p>
     </div>
-    
     <div class="card">
       <h3>User Need & Validation</h3>
       <p style="font-size:.85rem;line-height:1.6">The design of SafeDose AI was informed by informal feedback from frontline nurses and pharmacists in Nigeria. They highlighted that manual paper checklists are often skipped during high-pressure situations, and that identity mismatches are a real, persistent concern. No patient information was collected during this feedback process.</p>
     </div>
-
     <div class="card">
       <h3>Limitations</h3>
       <ul style="list-style:none;padding:0;font-size:.85rem;line-height:1.6">
@@ -188,6 +186,7 @@
 
 <nav>
   <button data-v="home" class="active" onclick="go('home')"><span class="ni">🏠</span>Home</button>
+  <button data-v="ai" onclick="go('ai')"><span class="ni">🤖</span>AI</button>
   <button data-v="verify" onclick="go('verify')"><span class="ni">💊</span>Verify</button>
   <button data-v="injection" onclick="go('injection')"><span class="ni">💉</span>Inject</button>
   <button data-v="monitor" onclick="go('monitor')"><span class="ni">📝</span>Monitor</button>
@@ -196,4 +195,4 @@
 
 <script src="app.js"></script>
 </body>
-                                                                                                           </html>
+                                                                                                                       </html>
