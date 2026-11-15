@@ -1,5 +1,7 @@
-const GROQ_API_KEY = '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';
-const MODEL = 'llama-3.3-70b-versatile';
+const CONFIG = {
+  GROQ_API_KEY: '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',
+  MODEL: 'llama-3.3-70b-versatile'
+};
 
 let stats = { verifications: 0, warnings: 0, checks: 0, observations: 0 };
 const MEDS = {
@@ -16,15 +18,15 @@ function go(id){
 }
 
 async function askAI(question){
-  if(!GROQ_API_KEY || GROQ_API_KEY === 'PASTE_YOUR_GROQ_KEY_HERE') {
-    return '⚠️ API key missing. Put your gsk_... key at the top of app.js.';
+  if(!CONFIG.GROQ_API_KEY || CONFIG.GROQ_API_KEY === 'PASTE_YOUR_GROQ_KEY_HERE') {
+    return '⚠️ API key missing. Put your gsk_... key inside the quotes on line 2 of app.js.';
   }
   const sys = "You are SafeDose AI, an educational assistant. RULES: Never prescribe, never calculate doses, never diagnose. Answer general safety questions only. Keep under 100 words.";
   try {
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {'Authorization': 'Bearer ' + GROQ_API_KEY, 'Content-Type': 'application/json'},
-      body: JSON.stringify({ model: MODEL, messages: [{role: 'system', content: sys}, {role: 'user', content: question}], max_tokens: 300 })
+      headers: {'Authorization': 'Bearer ' + CONFIG.GROQ_API_KEY, 'Content-Type': 'application/json'},
+      body: JSON.stringify({ model: CONFIG.MODEL, messages: [{role: 'system', content: sys}, {role: 'user', content: question}], max_tokens: 300 })
     });
     const d = await res.json();
     if(d.choices && d.choices[0]?.message?.content) return d.choices[0].message.content.trim();
@@ -129,4 +131,4 @@ function resetSession(){
   document.getElementById('chk-progress').textContent = '0 / 5';
   updateDashboard();
   alert("Session data reset to 0.");
-      }
+    }
