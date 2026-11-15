@@ -53,3 +53,10 @@ nav button .ni{font-size:1.2rem}nav button.active{color:var(--teal)}
 .log-tag{font-size:.65rem;padding:.15rem .4rem;border-radius:6px;font-weight:700}
 .log-tag.ok{background:var(--green-light);color:var(--green)}.log-tag.warn{background:var(--red-light);color:var(--red)}
 @media(min-width:600px){.stats-grid{grid-template-columns:repeat(4,1fr)}}
+.chat-box{background:var(--surface2);border-radius:12px;padding:.7rem;max-height:340px;overflow-y:auto;margin-bottom:.7rem;min-height:80px}
+.msg{margin-bottom:.6rem;padding:.55rem .75rem;border-radius:12px;font-size:.82rem;line-height:1.45;max-width:88%;word-wrap:break-word}
+.msg.user{background:var(--teal);color:#fff;margin-left:auto;border-bottom-right-radius:4px}
+.msg.ai{background:var(--surface);border:1px solid var(--border);border-bottom-left-radius:4px}
+.chat-input-row{display:flex;gap:.5rem}.chat-input-row input{flex:1}
+.sug{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem}
+.sug button{background:var(--teal-light);color:#004d40;border:1px solid #b2dfdb;border-radius:20px;padding:.35rem .7rem;font-size:.72rem;font-weight:600;width:auto}
